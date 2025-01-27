@@ -33,6 +33,7 @@ resource "null_resource" "inventory_update" {
   provisioner "local-exec" {
     command = <<EOT
       echo "[web_servers]" > inventory.txt
+      chmod 600 inventory.txt
       echo "ubuntu@${aws_instance.app_demo_server.public_ip}" ansible_ssh_private_key_file=../terraform/ssh/ansible_key >> inventory.txt
       mv inventory.txt ../ansible/
     EOT
