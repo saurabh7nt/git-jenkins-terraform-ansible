@@ -23,7 +23,7 @@ resource "aws_instance" "app_demo_server" {
   instance_type = "t2.micro"
   key_name      = aws_key_pair.ansible_key.key_name
   tags = {
-    Name = "ExampleAppDemoServerInstance2"
+    Name = "ExampleAppDemoServerInstance"
   }
 }
 
