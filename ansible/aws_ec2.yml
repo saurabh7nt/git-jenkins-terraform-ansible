@@ -8,4 +8,4 @@ keyed_groups:
   - key: tags.Name
     prefix: tag
 hostnames:
-  - public-ip-address
+  - ip-address
