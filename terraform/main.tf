@@ -13,29 +13,11 @@ provider "aws" {
   region = "us-east-1"
 }
 
-resource "aws_key_pair" "ansible_key" {
-  key_name   = "ansible_key"
-  public_key = file("${path.module}/ssh/ansible_key.pub")
-}
-
 resource "aws_instance" "app_demo_server" {
   ami           = "ami-04b4f1a9cf54c11d0"
   instance_type = "t2.micro"
-  key_name      = aws_key_pair.ansible_key.key_name
+  key_name      = Demo_key
   tags = {
     Name = "ExampleAppDemoServerInstance"
-  }
-}
-
-resource "null_resource" "inventory_update" {
-  depends_on = [aws_instance.app_demo_server]
-
-  provisioner "local-exec" {
-    command = <<EOT
-      echo "[web_servers]" > inventory.txt
-      echo "ubuntu@${aws_instance.app_demo_server.public_ip}" ansible_ssh_private_key_file=../terraform/ssh/ansible_key >> inventory.txt
-      chmod 600 inventory.txt
-      mv inventory.txt ../ansible/
-    EOT
   }
 }
