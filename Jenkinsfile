@@ -103,25 +103,39 @@ pipeline {
         // }
 
         stage('Wait for SSH on All Instances') {
-            steps {
-                withCredentials([file(credentialsId: 'demo_ssh_key', variable: 'SSH_KEY')]) {
-                    script {
-                        def ips = readJSON(text: env.INSTANCE_IPS)
-                        for (ip in ips) {
-                            sh """
-                                echo "Waiting for instance ${ip} to be ready..."
-                                chmod 400 $SSH_KEY
-                                set -x
-                                until ssh -i $SSH_KEY -o StrictHostKeyChecking=no ubuntu@${ip} "echo Instance ready"; do
-                                    echo "Instance ${ip} not ready yet. Retrying in 5 seconds..."
-                                    sleep 5
-                                done
-                            """
-                        }
+    steps {
+        withCredentials([file(credentialsId: 'demo_ssh_key', variable: 'SSH_KEY')]) {
+            script {
+                // Log the raw fetched IPs for debugging
+                echo "Raw fetched IPs: ${env.INSTANCE_IPS}"
+
+                // Parse IPs from JSON and validate the format
+                def ips = readJSON(text: env.INSTANCE_IPS)
+                echo "Parsed IPs: ${ips}"
+
+                // Ensure the 'ips' variable is a list and iterate over it
+                if (ips instanceof List) {
+                    for (ip in ips) {
+                        echo "Waiting for SSH on instance: ${ip}"
+
+                        // Add debug logs to ensure SSH command is running correctly
+                        sh """
+                            set -x
+                            chmod 400 $SSH_KEY
+                            until ssh -i $SSH_KEY -o StrictHostKeyChecking=no ubuntu@${ip} "echo Instance ready"; do
+                                echo "Instance ${ip} not ready yet. Retrying in 5 seconds..."
+                                sleep 5
+                            done
+                        """
                     }
+                } else {
+                    error "Fetched IPs are not in a valid list format: ${ips}"
                 }
             }
         }
+    }
+}
+
 
         stage('Run Ansible Playbook with Dynamic Inventory') {
             steps {
