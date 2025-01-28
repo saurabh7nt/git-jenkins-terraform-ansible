@@ -28,7 +28,7 @@ resource "null_resource" "inventory_update" {
   provisioner "local-exec" {
     command = <<EOT
       echo "[web_servers]" > inventory.txt
-      echo "ubuntu@${aws_instance.app_demo_server.public_ip}" ansible_ssh_private_key_file=./Demo_key.pem >> inventory.txt
+      echo "ubuntu@${aws_instance.app_demo_server.public_ip}" ansible_ssh_private_key_file=/home/saurabh/key-pair/Demo_key.pem >> inventory.txt
       mv inventory.txt ../ansible/
     EOT
   }
