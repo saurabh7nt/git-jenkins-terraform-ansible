@@ -7,5 +7,7 @@ filters:
 keyed_groups:
   - key: tags.Name
     prefix: tag
+groups:
+  web_servers: true
 hostnames:
   - ip-address
