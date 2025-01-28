@@ -67,20 +67,20 @@ pipeline {
         //     }
         // }
 
-         stage('Fetch EC2 IPs') {
-            steps {
-                dir('terraform') {
-                    script {
-                        def instanceIps = sh(
-                            script: "terraform output -json instance_public_ips",
-                            returnStdout: true
-                        ).trim()
-                        env.INSTANCE_IPS = instanceIps
-                        echo "Fetched EC2 Public IPs: ${env.INSTANCE_IPS}"
-                    }
-                }
-            }
-        }
+        //  stage('Fetch EC2 IPs') {
+        //     steps {
+        //         dir('terraform') {
+        //             script {
+        //                 def instanceIps = sh(
+        //                     script: "terraform output -json instance_public_ips",
+        //                     returnStdout: true
+        //                 ).trim()
+        //                 env.INSTANCE_IPS = instanceIps
+        //                 echo "Fetched EC2 Public IPs: ${env.INSTANCE_IPS}"
+        //             }
+        //         }
+        //     }
+        // }
 
         // stage('Wait for SSH on All Instances') {
         //     steps {
@@ -102,40 +102,14 @@ pipeline {
         //     }
         // }
 
-        stage('Wait for SSH on All Instances') {
-    steps {
-        withCredentials([file(credentialsId: 'demo_ssh_key', variable: 'SSH_KEY')]) {
-            script {
-                // Log the raw fetched IPs for debugging
-                echo "Raw fetched IPs: ${env.INSTANCE_IPS}"
-
-                // Parse IPs from JSON and validate the format
-                def ips = readJSON(text: env.INSTANCE_IPS)
-                echo "Parsed IPs: ${ips}"
-
-                // Ensure the 'ips' variable is a list and iterate over it
-                if (ips instanceof List) {
-                    for (ip in ips) {
-                        echo "Waiting for SSH on instance: ${ip}"
-
-                        // Add debug logs to ensure SSH command is running correctly
-                        sh """
-                            set -x
-                            chmod 400 $SSH_KEY
-                            until ssh -i $SSH_KEY -o StrictHostKeyChecking=no ubuntu@${ip} "echo Instance ready"; do
-                                echo "Instance ${ip} not ready yet. Retrying in 5 seconds..."
-                                sleep 5
-                            done
-                        """
-                    }
-                } else {
-                    error "Fetched IPs are not in a valid list format: ${ips}"
+        stage('sleep 15s'){
+            steps {
+                dir('ansible') {
+                    echo 'Waiting for instances to be ready...'
+                    sh 'sleep 15s'
                 }
             }
         }
-    }
-}
-
 
         stage('Run Ansible Playbook with Dynamic Inventory') {
             steps {
