@@ -82,6 +82,26 @@ pipeline {
             }
         }
 
+        // stage('Wait for SSH on All Instances') {
+        //     steps {
+        //         withCredentials([file(credentialsId: 'demo_ssh_key', variable: 'SSH_KEY')]) {
+        //             script {
+        //                 def ips = readJSON(text: env.INSTANCE_IPS)
+        //                 for (ip in ips) {
+        //                     sh """
+        //                         echo "Waiting for instance ${ip} to be ready..."
+        //                         chmod 400 $SSH_KEY
+        //                         until ssh -i $SSH_KEY -o StrictHostKeyChecking=no ubuntu@${ip} "echo Instance ready"; do
+        //                             echo "Instance ${ip} not ready yet. Retrying in 5 seconds..."
+        //                             sleep 5
+        //                         done
+        //                     """
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+
         stage('Wait for SSH on All Instances') {
             steps {
                 withCredentials([file(credentialsId: 'demo_ssh_key', variable: 'SSH_KEY')]) {
@@ -91,6 +111,7 @@ pipeline {
                             sh """
                                 echo "Waiting for instance ${ip} to be ready..."
                                 chmod 400 $SSH_KEY
+                                set -x
                                 until ssh -i $SSH_KEY -o StrictHostKeyChecking=no ubuntu@${ip} "echo Instance ready"; do
                                     echo "Instance ${ip} not ready yet. Retrying in 5 seconds..."
                                     sleep 5
