@@ -21,3 +21,16 @@ resource "aws_instance" "app_demo_server" {
     Name = "ExampleAppDemoServerInstance"
   }
 }
+
+resource "null_resource" "inventory_update" {
+  depends_on = [aws_instance.app_demo_server]
+
+  provisioner "local-exec" {
+    command = <<EOT
+      echo "[web_servers]" > inventory.txt
+      echo "ubuntu@${aws_instance.app_demo_server.public_ip}" ansible_ssh_private_key_file=./Demo_key >> inventory.txt
+      mv inventory.txt ../ansible/
+    EOT
+  }
+  
+}
