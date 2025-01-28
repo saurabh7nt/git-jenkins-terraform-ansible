@@ -18,7 +18,7 @@ resource "aws_instance" "app_demo_server" {
   instance_type = "t2.micro"
   key_name      = "Demo_key"
   tags = {
-    Name = "ExampleAppDemoServerInstance"
+    Name = "Terraform-Ansible-Instance"
   }
 }
 

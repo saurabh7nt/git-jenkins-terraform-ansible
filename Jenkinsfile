@@ -67,22 +67,30 @@ pipeline {
             }
         }
 
-        stage('Ping Ansible') {
+        stage('Run Ansible Playbook with Dynamic Inventory') {
             steps {
                 dir('ansible') {
-                    sh 'ANSIBLE_HOST_KEY_CHECKING=False ansible -i inventory.txt web_servers -m ping'
+                    sh 'ansible-playbook -i aws_ec2.yml playbook.yml -u ubuntu --private-key /home/saurabh/key-pair/Demo_key.pem'
                 }
             }
         }
+
+        // stage('Ping Ansible') {
+        //     steps {
+        //         dir('ansible') {
+        //             sh 'ansible -i inventory.txt web_servers -m ping'
+        //         }
+        //     }
+        // }
         
-         stage('Run Ansible') {
-            steps {
-                dir('ansible') {
-                    echo "Running Ansible to configure the infrastructure..."
-                    sh 'ansible-playbook -i inventory.txt playbook.yml'
-                }
-            }
-        }
+        //  stage('Run Ansible') {
+        //     steps {
+        //         dir('ansible') {
+        //             echo "Running Ansible to configure the infrastructure..."
+        //             sh 'ansible-playbook -i inventory.txt playbook.yml'
+        //         }
+        //     }
+        // }
         
     }
 }
